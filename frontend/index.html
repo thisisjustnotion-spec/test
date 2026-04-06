@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>실시간 화재 경보 프로그램 현황</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #111; color: white; margin: 0; padding: 20px; }
+        img { max-width: 95%; margin: 20px auto; border: 4px solid #0f0; border-radius: 8px; }
+        #status { font-size: 1.3em; margin: 15px; padding: 12px; border-radius: 6px; min-height: 1.5em; }
+        .alarm { background: #900; color: white; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+    </style>
+</head>
+<body>
+    <h1>실시간 화재 경보 프로그램 현황</h1>
+    <img id="yoloImg" src="" alt="이미지 대기중...">
+    <p id="status">연결 대기중...</p>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            // p 태그로 제작한 부분의 내용 변경하는 부분
+            const status = document.getElementById('status');
+            status.textContent = '✅ Socket 연결됨';
+            status.style.background = '#060';
+        });
+
+        socket.on('image', (data) => {
+            const img = document.getElementById('yoloImg');
+            const status = document.getElementById('status');
+            img.src = 'data:image/jpeg;base64,' + data.image;
+            // p 태그로 제작한 부분의 내용 변경하는 부분
+            status.textContent = '✅ 이미지 업데이트 (' + new Date().toLocaleTimeString() + ')';
+            status.style.background = '#060';
+        });
+
+        socket.on('gpio_input', (data) => {
+            // p 태그로 제작한 부분의 내용 변경하는 부분
+            const status = document.getElementById('status');
+            status.textContent = '🚨 알람! ' + data.message + ' (' + data.time + ')'; // 
+            status.style.background = '#900';
+            status.classList.add('alarm');
+            
+            // 알람 띄우는 부분
+            alert('🚨 GPIO 입력 감지!\n\n' + data.message);
+            setTimeout(() => status.classList.remove('alarm'), 8000);
+        });
+    </script>
+</body>
+</html>
