@@ -11,7 +11,7 @@ cap = cv2.VideoCapture(0)
 
 # YOLO 모델 로드 
 print("🔄 YOLO11n 모델 로딩 중...")
-model = YOLO("best.pt") 
+model = YOLO("best_ncnn_model") 
 
 @sio.event
 def connect():
